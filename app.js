@@ -11,7 +11,8 @@ import notificationRouter from './routes/notification.route.js';
 import chatRouter from './routes/chat.route.js';
 import { Server } from 'socket.io';
 import http from 'http';
-
+import dotenv from 'dotenv';
+dotenv.config();
 const activeUsers = {};
 const app = express();
 app.use(cors());
@@ -69,7 +70,7 @@ io.on('connection', (socket) => {
   });
 
 connectDB().then(() => {
-    server.listen(3000, () => {
+    server.listen(process.env.PORT, () => {
         console.log('Server is running on port 3000');
     });
 }).catch((err) => {
