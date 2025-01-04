@@ -15,7 +15,15 @@ import dotenv from 'dotenv';
 dotenv.config();
 const activeUsers = {};
 const app = express();
-app.use(cors());
+const corsoptions = [
+  cors({
+    origin: '*',
+    methods: '*',
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
+  })
+];
+app.use(corsoptions);
 app.use(express.json({ limit: '10mb' }));
 app.use('/uploads', express.static('uploads'));
 
@@ -78,3 +86,4 @@ connectDB().then(() => {
 });
 
 export { io, activeUsers };
+export default app;
