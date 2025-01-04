@@ -3,8 +3,8 @@ import Task from "../models/task.model.js";
 import {convertToIST } from "../utils/timestamp-format-utils.js";
 import { createNotification } from "./notification.controller.js";
 import Notification from "../models/notification.model.js";
-import { io } from "../index.js";
-import { activeUsers } from "../index.js";
+import { io } from "../app.js";
+import { activeUsers } from "../app.js";
 
 const createTask = async (req, res) => {
     let task = req.body;

@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import { generateToken } from "../utils/jwt.utils.js";
-import { activeUsers } from "../index.js";
+import { activeUsers } from "../app.js";
 
 const authenticateUser = async (req, res) => {
     req.body.username = req.body.username.toLowerCase();

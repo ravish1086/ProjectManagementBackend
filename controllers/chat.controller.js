@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import Chat from "../models/chat.model.js";
 import { getTimeAgo, convertToIST } from "../utils/timestamp-format-utils.js";
-import { activeUsers, io } from "../index.js";
+import { activeUsers, io } from "../app.js";
 
 const sendMessage = async (req, res) => {
     let message = req.body;

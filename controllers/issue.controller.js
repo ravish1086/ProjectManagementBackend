@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import Issue from "../models/issue.model.js";
-import { io } from "../index.js";
-import { activeUsers } from "../index.js";
+import { io } from "../app.js";
+import { activeUsers } from "../app.js";
 import { createNotification } from "./notification.controller.js";
 
 const createIssue = async (req, res) => {
