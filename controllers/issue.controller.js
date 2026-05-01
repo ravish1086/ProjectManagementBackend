@@ -39,7 +39,17 @@ const createIssue = async (req, res) => {
 
 const getIssues = async (req, res) => {
     try {
-        let issues = await Issue.find({issueProjectId:req.query.projectId}).sort({ createdAt: -1 }).populate('issueAssignee', 'username email fullName role');
+        let moduleId = req.query.moduleId;
+        let query = { issueProjectId: req.query.projectId };
+        if (moduleId && moduleId !== 'ALL') {
+            query.moduleId = moduleId;
+        }
+
+        let issues = await Issue.find(query)
+            .sort({ createdAt: -1 })
+            .populate('issueAssignee', 'username email fullName role')
+            .populate('moduleId', 'moduleName').lean();
+
         if (issues) {
             res.status(200).json({ issues: issues });
         }

@@ -36,12 +36,19 @@ const updateDiscussion = async (req, res) => {
 
 const getDiscussions = async (req, res) => {
     try {
-        let discussions = await Discussion.find({discussionForProject: req.query.projectId})
+        let moduleId = req.query.moduleId;
+        let query = { discussionForProject: req.query.projectId };
+        if (moduleId && moduleId !== 'ALL') {
+            query.moduleId = moduleId;
+        }
+
+        let discussions = await Discussion.find(query)
         .sort({ createdAt: -1 })
         .populate('discussionMembers', 'username email fullName role')
         .populate('discussionComments.commentedBy', 'username email fullName role')
         .populate('discussionOwner', 'username email fullName role')
-        .populate('createdBy', 'username email fullName role designation').lean();
+        .populate('createdBy', 'username email fullName role designation')
+        .populate('moduleId', 'moduleName').lean();
         
         const discussionsWithTimeAgo = discussions.map((discussion) => ({
             ...discussion,

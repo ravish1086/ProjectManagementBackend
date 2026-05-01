@@ -6,6 +6,10 @@ const issueSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'string',
     },
+    moduleId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'ProjectModule',
+    },
     issueTitle: {
         type: String,
         required: true,

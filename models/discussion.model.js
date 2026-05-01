@@ -10,6 +10,10 @@ const discussionSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Project',
     },
+    moduleId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'ProjectModule',
+    },
     discussionTitle: {
         type: String,
         required: true,
