@@ -65,37 +65,29 @@ const createTask = async (req, res) => {
 const getTasks = async (req, res) => {
     try {
         let dueType = req.query.dueType;
+        let moduleId = req.query.moduleId;
         let now = new Date();
         let todaysStartDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
         let todaysEndDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
-        let tasks;
+        
+        let query = { projectId: req.query.projectId };
+        
+        if (moduleId && moduleId !== 'ALL') {
+            query.moduleId = moduleId;
+        }
+
         if(dueType === 'Overdue') {
-            tasks = await Task.find({
-                projectId: req.query.projectId,
-                taskDueDate: { $lt: todaysStartDate }
-            })
+            query.taskDueDate = { $lt: todaysStartDate };
+        } else if(dueType === 'Today') {
+            query.taskDueDate = { $gte: todaysStartDate, $lt: todaysEndDate };
+        }
+
+        let tasks = await Task.find(query)
             .sort({ createdAt: -1 })
             .populate('taskMembers', 'username email fullName role')
             .populate('createdBy', 'username email fullName role')
             .populate('moduleId', 'moduleName').lean();
-        }
-        else if(dueType === 'Today') {
-            tasks = await Task.find({
-                projectId: req.query.projectId,
-                taskDueDate: { $gte: todaysStartDate, $lt: todaysEndDate }
-            })
-            .sort({ createdAt: -1 })
-            .populate('taskMembers', 'username email fullName role')
-            .populate('createdBy', 'username email fullName role')
-            .populate('moduleId', 'moduleName').lean();
-        }
-        else{
-            tasks = await Task.find({projectId: req.query.projectId})
-            .sort({ createdAt: -1 })
-            .populate('taskMembers', 'username email fullName role')
-            .populate('createdBy', 'username email fullName role')
-            .populate('moduleId', 'moduleName').lean();
-        }
+
         const updatedTasks = tasks.map((task) => ({
             ...task,
             taskDueDate: new Date(task.taskDueDate).toDateString(),
