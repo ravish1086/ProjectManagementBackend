@@ -76,7 +76,8 @@ const getTasks = async (req, res) => {
             })
             .sort({ createdAt: -1 })
             .populate('taskMembers', 'username email fullName role')
-            .populate('createdBy', 'username email fullName role').lean();
+            .populate('createdBy', 'username email fullName role')
+            .populate('moduleId', 'moduleName').lean();
         }
         else if(dueType === 'Today') {
             tasks = await Task.find({
@@ -85,13 +86,15 @@ const getTasks = async (req, res) => {
             })
             .sort({ createdAt: -1 })
             .populate('taskMembers', 'username email fullName role')
-            .populate('createdBy', 'username email fullName role').lean();
+            .populate('createdBy', 'username email fullName role')
+            .populate('moduleId', 'moduleName').lean();
         }
         else{
             tasks = await Task.find({projectId: req.query.projectId})
             .sort({ createdAt: -1 })
             .populate('taskMembers', 'username email fullName role')
-            .populate('createdBy', 'username email fullName role').lean();
+            .populate('createdBy', 'username email fullName role')
+            .populate('moduleId', 'moduleName').lean();
         }
         const updatedTasks = tasks.map((task) => ({
             ...task,
