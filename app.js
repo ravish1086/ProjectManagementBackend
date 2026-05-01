@@ -9,6 +9,8 @@ import discussionRouter from './routes/discussion.route.js';
 import commentRouter from './routes/comment.route.js';
 import notificationRouter from './routes/notification.route.js';
 import chatRouter from './routes/chat.route.js';
+import projectModuleRouter from './routes/projectModule.route.js';
+import apiRouter from './routes/api.route.js';
 import { Server } from 'socket.io';
 import http from 'http';
 import dotenv from 'dotenv';
@@ -40,6 +42,8 @@ app.use('/discussion', discussionRouter);
 app.use('/comment', commentRouter);
 app.use('/notification', notificationRouter);
 app.use('/chat', chatRouter);
+app.use('/projectModule', projectModuleRouter);
+app.use('/api', apiRouter);
 // Create an HTTP server
 const server = http.createServer(app);
 

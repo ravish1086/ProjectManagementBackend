@@ -1,11 +1,16 @@
 import mongoose, { Mongoose } from "mongoose";
 import User from "./user.model.js";
 import Project from "./project.model.js";
+import ProjectModule from "./projectModule.model.js";
 const taskSchema = new mongoose.Schema({
     projectId: {
         type:mongoose.Schema.Types.ObjectId,
         ref: 'Project',
         required: true
+    },
+    moduleId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'ProjectModule',
     },
     taskId: {
         type: String,
