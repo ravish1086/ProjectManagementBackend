@@ -4,7 +4,7 @@ import User from "./user.model.js";
 const issueSchema = new mongoose.Schema({
     issueProjectId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'string',
+        ref: 'Project',
     },
     moduleId: {
         type: mongoose.Schema.Types.ObjectId,

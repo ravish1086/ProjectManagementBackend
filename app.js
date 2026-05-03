@@ -12,6 +12,7 @@ import chatRouter from './routes/chat.route.js';
 import projectModuleRouter from './routes/projectModule.route.js';
 import apiRouter from './routes/api.route.js';
 import noteRouter from './routes/note.route.js';
+import dashboardRouter from './routes/dashboard.route.js';
 import { Server } from 'socket.io';
 import http from 'http';
 import dotenv from 'dotenv';
@@ -46,6 +47,7 @@ app.use('/chat', chatRouter);
 app.use('/projectModule', projectModuleRouter);
 app.use('/api', apiRouter);
 app.use('/note', noteRouter);
+app.use('/dashboard', dashboardRouter);
 // Create an HTTP server
 const server = http.createServer(app);
 
