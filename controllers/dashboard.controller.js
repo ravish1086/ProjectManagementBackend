@@ -5,34 +5,28 @@ import Discussion from '../models/discussion.model.js';
 import Note from '../models/note.model.js';
 import { convertToIST, getTimeAgo } from "../utils/timestamp-format-utils.js";
 
-const getDashboardData = async (req, res) => {
+const getUserProjectIds = async (userId) => {
+    const projects = await Project.find({
+        $and: [
+            { isArchived: { $ne: true } },
+            { $or: [{ projectMembers: userId }, { projectManager: userId }] }
+        ]
+    }).select('_id');
+    return projects.map(p => p._id);
+};
+
+const getDashboardTasks = async (req, res) => {
     try {
         const userId = req.user._id;
-
-        // Fetch all active projects for the user
-        let projects = await Project.find({
-            $and: [
-                { isArchived: { $ne: true } },
-                { $or: [ 
-                    {projectMembers: userId}, 
-                    {projectManager: userId}
-                ]}
-            ]
-        }).select('_id');
-
-        const projectIds = projects.map(p => p._id);
+        const projectIds = await getUserProjectIds(userId);
 
         if (projectIds.length === 0) {
-            return res.status(200).json({ data: { tasks: [], issues: [], discussions: [], notes: [] } });
+            return res.status(200).json({ tasks: [] });
         }
 
-        // Fetch tasks
         let tasks = await Task.find({
             projectId: { $in: projectIds },
-            $or: [
-                { taskMembers: userId },
-                { createdBy: userId }
-            ]
+            taskMembers: userId
         })
         .sort({ createdAt: -1 })
         .populate('projectId', 'projectName')
@@ -47,13 +41,24 @@ const getDashboardData = async (req, res) => {
             createdAt: convertToIST(task.createdAt)
         }));
 
-        // Fetch issues
+        res.status(200).json({ tasks: updatedTasks });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+const getDashboardIssues = async (req, res) => {
+    try {
+        const userId = req.user._id;
+        const projectIds = await getUserProjectIds(userId);
+
+        if (projectIds.length === 0) {
+            return res.status(200).json({ issues: [] });
+        }
+
         let issues = await Issue.find({
             issueProjectId: { $in: projectIds },
-            $or: [
-                { issueAssignee: userId },
-                { createdBy: userId }
-            ]
+            issueAssignee: userId
         })
         .sort({ createdAt: -1 })
         .populate('issueProjectId', 'projectName')
@@ -61,7 +66,21 @@ const getDashboardData = async (req, res) => {
         .populate('issueAssignee', 'fullName')
         .lean();
 
-        // Fetch discussions
+        res.status(200).json({ issues });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+const getDashboardDiscussions = async (req, res) => {
+    try {
+        const userId = req.user._id;
+        const projectIds = await getUserProjectIds(userId);
+
+        if (projectIds.length === 0) {
+            return res.status(200).json({ discussions: [] });
+        }
+
         let discussions = await Discussion.find({
             discussionForProject: { $in: projectIds },
             $or: [
@@ -76,33 +95,39 @@ const getDashboardData = async (req, res) => {
         .populate('createdBy', 'fullName')
         .lean();
 
-        const discussionsWithTimeAgo = discussions.map((discussion) => ({
-            ...discussion,
-            createdAtAgo: getTimeAgo(discussion.createdAt),
+        const discussionsWithTimeAgo = discussions.map((d) => ({
+            ...d,
+            createdAtAgo: getTimeAgo(d.createdAt),
         }));
 
-        // Fetch notes
-        let notes = await Note.find({
-            projectId: { $in: projectIds },
-            userId: userId,
-            content: { $ne: '' } // Only fetch notes that have content
-        })
-        .sort({ date: -1 })
-        .populate('projectId', 'projectName')
-        .lean();
-
-        res.status(200).json({
-            data: {
-                tasks: updatedTasks,
-                issues: issues,
-                discussions: discussionsWithTimeAgo,
-                notes: notes
-            }
-        });
-
+        res.status(200).json({ discussions: discussionsWithTimeAgo });
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }
 };
 
-export { getDashboardData };
+const getDashboardNotes = async (req, res) => {
+    try {
+        const userId = req.user._id;
+        const projectIds = await getUserProjectIds(userId);
+
+        if (projectIds.length === 0) {
+            return res.status(200).json({ notes: [] });
+        }
+
+        let notes = await Note.find({
+            projectId: { $in: projectIds },
+            userId: userId,
+            content: { $ne: '' }
+        })
+        .sort({ date: -1 })
+        .populate('projectId', 'projectName')
+        .lean();
+
+        res.status(200).json({ notes });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+export { getDashboardTasks, getDashboardIssues, getDashboardDiscussions, getDashboardNotes };
