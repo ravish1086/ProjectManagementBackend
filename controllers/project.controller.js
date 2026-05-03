@@ -19,10 +19,15 @@ const createProject = async (req, res) => {
 
 const getProjects = async (req, res) => {
     try {
-        let projects = await Project.find({ $or: [ 
-            {projectMembers: req.user._id}, 
-            {projectManager: req.user._id}
-        ]})
+        let projects = await Project.find({
+            $and: [
+                { isArchived: { $ne: true } },
+                { $or: [ 
+                    {projectMembers: req.user._id}, 
+                    {projectManager: req.user._id}
+                ]}
+            ]
+        })
         .sort({ createdAt: -1 })
         .populate('projectMembers', 'username email fullName role designation')
         .populate('projectManager', 'username email fullName role _id designation');
@@ -37,4 +42,17 @@ const getProjects = async (req, res) => {
     }
 }
 
-export { createProject, getProjects };
+const updateProject = async (req, res) => {
+    try {
+        let project = await Project.findOneAndUpdate({_id: req.params.id}, req.body, {new: true});
+        if (project) {
+            res.status(200).json({ status: 200, message: "Project updated", project: project });
+        } else {
+            res.status(404).json({ message: "Project not found" });
+        }
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+}
+
+export { createProject, getProjects, updateProject };

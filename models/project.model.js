@@ -32,6 +32,10 @@ const project = new mongoose.Schema({
     projectStatus: {
         type: String,
         
+    },
+    isArchived: {
+        type: Boolean,
+        default: false
     }
     },
     {
